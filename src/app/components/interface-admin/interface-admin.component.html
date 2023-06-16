@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Interface</title>
+  <!-- Lien vers le fichier CSS de Tailwind -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+  <div class="flex justify-center items-center h-screen">
+    <div class="w-80 bg-white rounded-lg shadow-md p-8">
+      <h2 class="text-2xl font-semibold mb-6">Interface Administrateur</h2>
+      <form>
+        <div class="mb-4">
+          <label for="room" class="text-gray-700 font-medium">Choisir une salle</label>
+          <select id="room" name="room" class="w-full border-gray-300 border-solid border-2 rounded-md px-4 py-2 mt-1 focus:outline-none focus:border-blue-500">
+            <option value="room1">Salle 1</option>
+            <option value="room2">Salle 2</option>
+          </select>
+        </div>
+        <div class="mb-4">
+          <label for="newRoom" class="text-gray-700 font-medium">Créer une nouvelle salle</label>
+          <input type="text" id="newRoom" name="newRoom" class="w-full border-gray-300 border-solid border-2 rounded-md px-4 py-2 mt-1 focus:outline-none focus:border-blue-500" required>
+        </div>
+        <div class="flex justify-center space-x-4">
+          <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring focus:ring-blue-500">
+            Créer la salle
+          </button>
+          <button type="button" class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring focus:ring-green-500">
+            Join Room
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
