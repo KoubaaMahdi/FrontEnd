@@ -38,15 +38,6 @@ export class InterfaceComponent implements OnInit {
       a.instance.message = msg;
       a.instance.date="15april"
     });
-    this.isLoggedIn = await this.keycloak.isLoggedIn();
-
-      if (this.isLoggedIn) {
-        this.userProfile = await this.keycloak.loadUserProfile();
-      }
-      else{
-        this.router.navigate(['/'])
-      }
-
   }
 
     
