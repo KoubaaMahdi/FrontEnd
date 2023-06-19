@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -19,6 +19,24 @@ import { LoginComponent } from './components/login/login.component';
 import { InterfaceAdminComponent } from './components/interface-admin/interface-admin.component';
 import { InterfaceUserComponent } from './components/interface-user/interface-user.component';
 import { PickerModule } from "@ctrl/ngx-emoji-mart";
+import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
+import { HttpClientModule } from '@angular/common/http';
+
+
+function initializeKeycloak(keycloak: KeycloakService) {
+  return () =>
+    keycloak.init({
+      config: {
+        url: 'http://localhost:8080',
+        realm: 'myreal',
+        clientId: 'angular-id'
+      },
+      initOptions: {
+        onLoad: 'check-sso',
+        
+      }
+    });
+}
 @NgModule({
   declarations: [
     AppComponent,
@@ -40,11 +58,19 @@ import { PickerModule } from "@ctrl/ngx-emoji-mart";
   imports: [
     BrowserModule,
     AppRoutingModule,
-    PickerModule
+    KeycloakAngularModule,
+    PickerModule,
+    HttpClientModule
   ],
   providers: [
     ChatService,
-    WebsocketService
+    WebsocketService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeKeycloak,
+      multi: true,
+      deps: [KeycloakService]
+    }
   ],
   bootstrap: [AppComponent]
 })
