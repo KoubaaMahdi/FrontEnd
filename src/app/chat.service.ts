@@ -21,11 +21,21 @@ export class ChatService {
 
   // Our simplified interface for sending
   // messages back to our socket.io server
-  sendMsg(msg:any) {
+  /*sendMsg(msg:any) {
     this.messages.next(msg);
+  }*/
+
+  sendMsg(msg:any){
+    this.messages.next(msg)
   }
   joinRoom(room: string) {
     this.wsService.joinRoom(room);
+  }
+  connectClient(){
+    this.wsService.connectClient();
+  }
+  disconnect(){
+    this.wsService.disconnect()
   }
 
 }

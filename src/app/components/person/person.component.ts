@@ -6,6 +6,7 @@ import { Component ,Input} from '@angular/core';
   styleUrls: ['./person.component.css']
 })
 export class PersonComponent {
+  @Input() photo:string ='';
   @Input() name: string = '';
   @Input() notification: string = '';
   @Input() date :string=' ';

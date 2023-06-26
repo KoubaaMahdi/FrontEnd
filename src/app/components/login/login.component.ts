@@ -3,6 +3,7 @@
   import { KeycloakLoginOptions, KeycloakProfile } from 'keycloak-js';
   import { Router } from '@angular/router';
   import { HttpClient, HttpHeaders } from '@angular/common/http';
+  import { ChatService } from '../../chat.service';
 
 
 
@@ -13,44 +14,46 @@
     styleUrls: ['./login.component.css']
   })
   export class LoginComponent {
-    tokenUrl = 'http://localhost:8080/realms/myreal/protocol/openid-connect/token';
+    tokenUrl = 'http://'+window.location.hostname+':8080/realms/myreal/protocol/openid-connect/token';
     tokenHeaders = new HttpHeaders({
       'Content-Type': 'application/x-www-form-urlencoded',
     });
 
     tokenBody = new URLSearchParams();
-    keycloakLoginOptions: KeycloakLoginOptions = {
-      redirectUri: 'http://localhost:4200/chat'
-    }
+    /*keycloakLoginOptions: KeycloakLoginOptions = {
+      redirectUri: 'http://172.16.0.195:4200/chat'
+    }*/
     
     public isLoggedIn = false;
-    public userProfile: KeycloakProfile | null = null;
+    //public userProfile: KeycloakProfile | null = null;
 
-    constructor(private readonly keycloak: KeycloakService,private router: Router,private http: HttpClient) {}
+    constructor(private readonly keycloak: KeycloakService,private router: Router,private http: HttpClient,private chat: ChatService) {}
     public async ngOnInit() {
-      
-      this.isLoggedIn = await this.keycloak.isLoggedIn();
-
-      if (this.isLoggedIn) {
-        this.userProfile = await this.keycloak.loadUserProfile();
+      const test = localStorage.getItem('currentUser')
+      if(test){
+        if(test){
+          this.router.navigate(['/chat'])
+        }
       }
+      
     }
 
     public async login() {
-      //this.checkIfClientExists()
+      this.checkIfClientExists();
+      
       //this.keycloak.login(this.keycloakLoginOptions)
       
       
     }
     
 
-    public logout() {
+    /*public logout() {
       this.keycloak.logout();
-    }
+    }*/
   async checkIfClientExists() {
   
     // Obtain an access token using the provided username and password
-
+    const block = document.getElementById("wrong") as HTMLInputElement;
     const usernameObject = document.getElementById('username')as HTMLInputElement | null;
     const passwordObject = document.getElementById('password')as HTMLInputElement | null;
     const username =usernameObject?.value || '';
@@ -59,18 +62,24 @@
     this.tokenBody.set('client_id', 'angular-id');
     this.tokenBody.set('username', username);
     this.tokenBody.set('password', password);
-    this.tokenBody.set('client_secret', 'EcNkQPWAHzXiTvQPWJy7RBhanNUyGXwh');
-    const tokenResponse: any = await this.http.post(this.tokenUrl, this.tokenBody.toString(), { headers: this.tokenHeaders }).toPromise();
+    this.tokenBody.set('client_secret', 'ZPI7KVeI23AymvZ4aU0FXSa2vX5oG5gJ');
+    try{
+      const tokenResponse: any = await this.http.post(this.tokenUrl, this.tokenBody.toString(), { headers: this.tokenHeaders }).toPromise();
+
+      const accessToken = tokenResponse?.access_token;
+      const refreshToken = tokenResponse?.refresh_token;
     
-    const accessToken = tokenResponse?.access_token;
-    console.log(accessToken)
     if (!accessToken) {
-      throw new Error('Access token not received');
+      
     }
     else{
-      
+      localStorage.setItem('currentUser', JSON.stringify({ name: username,token: accessToken,refresh: refreshToken }));
       this.router.navigate(["/chat"])
+      
     }
+  }catch{
+    block.setAttribute("class","error")
   }
+    }
   
 }

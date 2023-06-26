@@ -27,7 +27,7 @@ function initializeKeycloak(keycloak: KeycloakService) {
   return () =>
     keycloak.init({
       config: {
-        url: 'http://localhost:8080',
+        url: "http://"+window.location.hostname+":8080",
         realm: 'myreal',
         clientId: 'angular-id'
       },
@@ -35,6 +35,7 @@ function initializeKeycloak(keycloak: KeycloakService) {
         onLoad: 'check-sso',
         
       }
+      
     });
 }
 @NgModule({

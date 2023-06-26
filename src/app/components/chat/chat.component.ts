@@ -9,6 +9,8 @@ import { Component,Input } from '@angular/core';
   
 })
 export class ChatComponent {
-@Input() message:string='';
-@Input() date :string='';
+  @Input() photo:string ='';
+  @Input() name:string='';
+  @Input() message:string='';
+  @Input() date :string='';
 }

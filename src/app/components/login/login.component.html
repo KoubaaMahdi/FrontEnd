@@ -6,6 +6,17 @@
   <title>Login</title>
   <!-- Lien vers le fichier CSS de Tailwind -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .error {
+      background-color: red;
+      color: white;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      opacity: 0.4;
+      border-radius: 20px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body class="bg-gray-100">
   <div class="flex justify-center items-center h-screen">
@@ -20,12 +31,16 @@
           <label for="password" class="text-gray-700 font-medium">Mot de passe</label>
           <input type="password" id="password" name="password" class="w-full border-gray-300 border-solid border-2 rounded-md px-4 py-2 mt-1 focus:outline-none focus:border-blue-500" required>
         </div>
+        <div class="mb-6">
+          <label for="remember" class="flex items-center">
+            <input type="checkbox" id="remember" name="remember" class="form-checkbox" />
+            <span class="ml-2 text-gray-700">Se souvenir de moi</span>
+          </label>
+        </div>
+        <div id="wrong" class="error hidden">Mot de passe ou utilisateur incorrect</div>
         <div class="flex justify-center">
           <button *ngIf="!isLoggedIn" type="button" (click)="login()" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring focus:ring-blue-500">
             Se connecter
-          </button>
-          <button  type="button" (click)="logout()"  type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring focus:ring-blue-500">
-            logout
           </button>
         </div>
       </form>

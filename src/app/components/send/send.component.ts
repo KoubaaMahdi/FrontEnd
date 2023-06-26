@@ -12,6 +12,7 @@ export class SendComponent {
   @Output() sendClick = new EventEmitter<void>();
   public textArea: string = "";
   public isEmojiPickerVisible: boolean | undefined;
+  keyupEnter: any;
   public addEmoji(event:any) {
     this.textArea = `${this.textArea}${event.emoji.native}`;
     this.isEmojiPickerVisible = false;
