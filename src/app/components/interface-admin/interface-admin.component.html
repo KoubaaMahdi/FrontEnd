@@ -1,38 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Interface</title>
-  <!-- Lien vers le fichier CSS de Tailwind -->
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100">
-  <div class="flex justify-center items-center h-screen">
-    <div class="w-80 bg-white rounded-lg shadow-md p-8">
-      <h2 class="text-2xl font-semibold mb-6">Interface Administrateur</h2>
-      <form>
-        <div class="mb-4">
-          <label for="room" class="text-gray-700 font-medium">Choisir une salle</label>
-          <select id="room" name="room" class="w-full border-gray-300 border-solid border-2 rounded-md px-4 py-2 mt-1 focus:outline-none focus:border-blue-500">
-            <option value="room1">Salle 1</option>
-            <option value="room2">Salle 2</option>
-          </select>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Tailwind Styling</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.7/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+      .custom-container {
+        background-color: #f7fafc;
+      }
+    </style>
+    
+  </head>
+  <body>
+    <div class="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-20">
+      <div class="max-w-xl w-full space-y-8">
+        <div class="custom-container p-6 rounded-md shadow-md">
+          <div class="flex justify-center space-x-4">
+            <button id="getUsersBtn" class="btn-blue" (click)="getUsers()">Get Users</button>
+            <button id="getRoomsBtn" class="btn-green" (click)="getRooms()">Get Rooms</button>
+            <button id="createRoomBtn" class="btn-purple" (click)="showCreateRoomForm()">Create Room</button>
+          </div>
+
+          <div id="content" class="mt-4">
+            <table *ngIf="showUsers" class="table-auto w-full">
+              <thead>
+                <tr>
+                  <th class="bg-white-500 text-black py-2 px-4">Username</th>
+                  <th class="bg-white-500 text-black py-2 px-4">First Name</th>
+                  <th class="bg-white-500 text-black py-2 px-4">Last Name</th>
+                  <th class="bg-white-500 text-black py-2 px-4">Email</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let user of users">
+                  <td class="border-b border-black py-2 px-4">{{ user.username }}</td>
+                  <td class="border-b border-black py-2 px-4">{{ user.firstName }}</td>
+                  <td class="border-b border-black py-2 px-4">{{ user.lastName }}</td>
+                  <td class="border-b border-black py-2 px-4">{{ user.email }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <table *ngIf="showRooms" class="table-auto w-full">
+              <thead>
+                <tr>
+                  <th class="bg-white-500 text-black py-2 px-4">Room Name</th>
+                  <th class="bg-white-500 text-black py-2 px-4">Users In Room</th>
+                  <th class="bg-white-500 text-black py-2 px-4"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let room of rooms">
+                  <td class="border-b border-black py-2 px-4 text-center">{{ room.Name }}</td>
+                  <td class="border-b border-black py-2 px-4 text-center">{{ room.Count }}</td>
+                  <td class="border-b border-black py-2 px-4 text-center">
+                    <div class="py-2">
+                      <button (click)="toggleDropdown(room)" class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-900 bg-inherit rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-600" type="button"> 
+                        <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                        </svg>
+                      </button>
+                      <ul [class.hidden]="!room.isDropdownOpen" class="absolute  mt-2 py-2 text-sm text-gray-700 dark:text-gray-200 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
+                        <li>
+                          <div  class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white text-center"><button (click)="showPopUpUsers(room)">View Users</button></div>
+                        </li>
+                        <li>
+                          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Add Users</a>
+                        </li>
+                        <li>
+                          <div  class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white text-center"><button (click)="showPopUpRemoveUser(room)">Remove User</button></div>
+
+                        </li>
+                        <li>
+                          <div  class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white text-center"><button (click)="removeRoom(room)">Remove Room</button></div>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div *ngIf="showCreateRoom" class="mt-4 text-center">
+              <input id="name" [(ngModel)]="newRoomName" class="border border-gray-400 rounded px-4 py-2 w-full" type="text" placeholder="Enter room name">
+              <button class="btn-purple mt-2 mx-auto" (click)="createRoom()">Create</button>
+            </div>
+          </div>
         </div>
-        <div class="mb-4">
-          <label for="newRoom" class="text-gray-700 font-medium">Créer une nouvelle salle</label>
-          <input type="text" id="newRoom" name="newRoom" class="w-full border-gray-300 border-solid border-2 rounded-md px-4 py-2 mt-1 focus:outline-none focus:border-blue-500" required>
-        </div>
-        <div class="flex justify-center space-x-4">
-          <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring focus:ring-blue-500">
-            Créer la salle
-          </button>
-          <button type="button" class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring focus:ring-green-500">
-            Join Room
-          </button>
-        </div>
-      </form>
+      </div>
+      
+      
+      
     </div>
-  </div>
-</body>
+    
+
+  </body>
+
 </html>

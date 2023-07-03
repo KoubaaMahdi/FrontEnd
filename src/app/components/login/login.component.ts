@@ -1,12 +1,10 @@
   import { Component } from '@angular/core';
   import { KeycloakService } from 'keycloak-angular';
-  import { KeycloakLoginOptions, KeycloakProfile } from 'keycloak-js';
+  import { NgModule } from '@angular/core';
+  import { FormsModule } from '@angular/forms';
   import { Router } from '@angular/router';
   import { HttpClient, HttpHeaders } from '@angular/common/http';
   import { ChatService } from '../../chat.service';
-
-
-
 
   @Component({
     selector: 'app-login',
@@ -14,19 +12,13 @@
     styleUrls: ['./login.component.css']
   })
   export class LoginComponent {
+    isChecked: boolean = false;
     tokenUrl = 'http://'+window.location.hostname+':8080/realms/myreal/protocol/openid-connect/token';
     tokenHeaders = new HttpHeaders({
       'Content-Type': 'application/x-www-form-urlencoded',
     });
-
     tokenBody = new URLSearchParams();
-    /*keycloakLoginOptions: KeycloakLoginOptions = {
-      redirectUri: 'http://172.16.0.195:4200/chat'
-    }*/
-    
     public isLoggedIn = false;
-    //public userProfile: KeycloakProfile | null = null;
-
     constructor(private readonly keycloak: KeycloakService,private router: Router,private http: HttpClient,private chat: ChatService) {}
     public async ngOnInit() {
       const test = localStorage.getItem('currentUser')
@@ -41,15 +33,16 @@
     public async login() {
       this.checkIfClientExists();
       
-      //this.keycloak.login(this.keycloakLoginOptions)
       
       
     }
     
-
-    /*public logout() {
-      this.keycloak.logout();
-    }*/
+    onCheckboxChange(checked: Event) {
+      const checkbox = checked.target as HTMLInputElement;
+      this.isChecked = checkbox.checked
+    
+    }
+    
   async checkIfClientExists() {
   
     // Obtain an access token using the provided username and password
@@ -69,13 +62,12 @@
       const accessToken = tokenResponse?.access_token;
       const refreshToken = tokenResponse?.refresh_token;
     
-    if (!accessToken) {
-      
-    }
-    else{
+    if (accessToken) {
       localStorage.setItem('currentUser', JSON.stringify({ name: username,token: accessToken,refresh: refreshToken }));
+      if(this.isChecked){
+        localStorage.setItem('LoginCreds',JSON.stringify({ username: username,pass: password}))
+      }
       this.router.navigate(["/chat"])
-      
     }
   }catch{
     block.setAttribute("class","error")

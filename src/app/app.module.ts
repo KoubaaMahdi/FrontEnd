@@ -1,7 +1,6 @@
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule,ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { PersonComponent } from './components/person/person.component';
@@ -17,11 +16,14 @@ import { WebsocketService } from './websocket.service';
 import { InterfaceComponent } from './components/interface/interface.component';
 import { LoginComponent } from './components/login/login.component';
 import { InterfaceAdminComponent } from './components/interface-admin/interface-admin.component';
-import { InterfaceUserComponent } from './components/interface-user/interface-user.component';
 import { PickerModule } from "@ctrl/ngx-emoji-mart";
 import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
 import { HttpClientModule } from '@angular/common/http';
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatDialogModule } from '@angular/material/dialog';
+import { ShowUsersPopUpComponent } from './components/show-users-pop-up/show-users-pop-up.component';
+import { ShowRemoveUserPopUpComponent } from './components/show-remove-user-pop-up/show-remove-user-pop-up.component';
+import { MatTableModule } from '@angular/material/table'  
 
 function initializeKeycloak(keycloak: KeycloakService) {
   return () =>
@@ -52,7 +54,9 @@ function initializeKeycloak(keycloak: KeycloakService) {
     InterfaceComponent,
     LoginComponent,
     InterfaceAdminComponent,
-    InterfaceUserComponent
+    ShowUsersPopUpComponent,
+    ShowRemoveUserPopUpComponent,
+    
     
 
   ],
@@ -61,7 +65,12 @@ function initializeKeycloak(keycloak: KeycloakService) {
     AppRoutingModule,
     KeycloakAngularModule,
     PickerModule,
-    HttpClientModule
+    HttpClientModule,
+    FormsModule,
+    ReactiveFormsModule,
+    BrowserAnimationsModule,
+    MatDialogModule,
+    MatTableModule
   ],
   providers: [
     ChatService,

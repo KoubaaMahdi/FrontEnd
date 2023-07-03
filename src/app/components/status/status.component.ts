@@ -16,7 +16,6 @@ export class StatusComponent {
       const{name} = JSON.parse(st) as { name:string };
       this.ConnectedUser=name
     }
-    console.log(this.ConnectedUser)
   }
   logout(){
     localStorage.clear()

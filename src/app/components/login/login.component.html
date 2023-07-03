@@ -33,7 +33,7 @@
         </div>
         <div class="mb-6">
           <label for="remember" class="flex items-center">
-            <input type="checkbox" id="remember" name="remember" class="form-checkbox" />
+            <input type="checkbox" id="remember" name="remember" class="form-checkbox"  (change)="onCheckboxChange($event)"/>
             <span class="ml-2 text-gray-700">Se souvenir de moi</span>
           </label>
         </div>

@@ -24,7 +24,9 @@ export class ChatService {
   /*sendMsg(msg:any) {
     this.messages.next(msg);
   }*/
-
+  sendFile(name:any,data:any){
+    
+  }
   sendMsg(msg:any){
     this.messages.next(msg)
   }

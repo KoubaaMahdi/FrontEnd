@@ -1,0 +1,40 @@
+.file-input-label {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  width: fit-content;
+}
+
+.file-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.message-container {
+  position: relative;
+}
+
+.file-upload {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.progress-bar {
+  width: 100px;
+  height: 5px;
+  background-color: #eee;
+  margin-left: 10px;
+}
+
+.progress {
+  height: 100%;
+  background-color: #4caf50;
+  width: 0;
+  transition: width 0.3s ease-in-out;
+}
