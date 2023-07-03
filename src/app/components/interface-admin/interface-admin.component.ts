@@ -14,7 +14,9 @@ export class InterfaceAdminComponent {
 
   constructor(private router: Router,private http: HttpClient,private dialog: MatDialog){}
   currentUserString = localStorage.getItem('currentUser');
- 
+  datasource: User[] = []
+  displayedColumns: string[] = ['username', 'firstName', 'lastName', 'email'];
+
   async ngOnInit() {
     if(!this.currentUserString){
       this.router.navigate(['/'])
@@ -101,7 +103,8 @@ export class InterfaceAdminComponent {
         };
         this.users.push(currentUser)
     })
-     
+    this.datasource =this.users;
+    console.log(this.users)
     
     this.showUsers = true;
     this.showRooms = false;

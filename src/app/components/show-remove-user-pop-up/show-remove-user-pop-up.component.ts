@@ -3,6 +3,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import {MatTable} from '@angular/material/table';
+import {SelectionModel} from '@angular/cdk/collections';
+
 
 @Component({
   selector: 'app-show-remove-user-pop-up',
@@ -14,11 +16,15 @@ import {MatTable} from '@angular/material/table';
 export class ShowRemoveUserPopUpComponent {
   constructor(private router: Router,private http: HttpClient,@Inject(MAT_DIALOG_DATA) public data: Room,private changeDetectorRefs: ChangeDetectorRef){}
   @ViewChild(MatTable) table: MatTable<any> | undefined;
+  hasMembers : boolean = false
+  noMembers : boolean = false
   users: User[] = [];
-  datasource: User[] = []
+  datasource :User[]=[]
+  selection = new SelectionModel<User>(true, []);
   ngOnInit(){
     this.getUsers()
-    
+    //this.datasource.paginator = this.paginator;
+
   }
   
   async RefreshToken(){
@@ -89,10 +95,31 @@ export class ShowRemoveUserPopUpComponent {
       this.table.renderRows()
     }
     this.datasource =this.users;
-    console.log(this.users)
+    if(userResponse.length>0){
+      this.hasMembers=true
+      this.noMembers = false
+    }else{
+      this.hasMembers=false
+      this.noMembers = true
+    }
 }
-displayedColumns: string[] = ['username', 'firstName', 'lastName', 'email'];
+displayedColumns: string[] = ['select','username', 'firstName', 'lastName', 'email'];
+isAllSelected() {
+  const numSelected = this.selection.selected.length;
+  const numRows = this.datasource.length;
+  return numSelected === numRows;
+}
 
+/** Selects all rows if they are not all selected; otherwise clear selection. */
+masterToggle() {
+  this.isAllSelected() ?
+      this.selection.clear() :
+      this.datasource.forEach(row => this.selection.select(row));
+}
+
+logSelection() {
+  this.selection.selected.forEach(s => console.log(s));
+}
 }
 interface User {
   id : number

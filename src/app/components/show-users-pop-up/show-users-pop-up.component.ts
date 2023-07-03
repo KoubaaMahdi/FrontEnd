@@ -12,10 +12,13 @@ export class ShowUsersPopUpComponent {
   constructor(private router: Router,private http: HttpClient,@Inject(MAT_DIALOG_DATA) public data: Room){}
   hasMembers : boolean = false
   noMembers : boolean = false
+  users: User[] = [];
+  datasource: User[] = []
+  displayedColumns: string[] = ['username', 'firstName', 'lastName', 'email'];
+
   ngOnInit(){
     this.getUsers()
   }
-  users: User[] = [];
   async RefreshToken(){
     const test = localStorage.getItem('currentUser')
     try{
@@ -87,6 +90,8 @@ export class ShowUsersPopUpComponent {
       this.hasMembers=false
       this.noMembers = true
     }
+    this.datasource =this.users;
+    console.log(this.users)
   
   }
 }

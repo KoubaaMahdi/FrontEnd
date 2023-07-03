@@ -24,6 +24,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { ShowUsersPopUpComponent } from './components/show-users-pop-up/show-users-pop-up.component';
 import { ShowRemoveUserPopUpComponent } from './components/show-remove-user-pop-up/show-remove-user-pop-up.component';
 import { MatTableModule } from '@angular/material/table'  
+import {MatPaginatorModule} from '@angular/material/paginator';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 function initializeKeycloak(keycloak: KeycloakService) {
   return () =>
@@ -70,7 +72,9 @@ function initializeKeycloak(keycloak: KeycloakService) {
     ReactiveFormsModule,
     BrowserAnimationsModule,
     MatDialogModule,
-    MatTableModule
+    MatTableModule,
+    MatCheckboxModule,
+    MatPaginatorModule,
   ],
   providers: [
     ChatService,
