@@ -8,98 +8,112 @@
       .custom-container {
         background-color: #f7fafc;
       }
+      mat-menu{
+        width : 150px
+      }
     </style>
     
   </head>
   <body>
-    <div class="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-20">
+    
+
+    <div style="display: flex; justify-content: flex-end; padding-top: 50px; padding-right: 50px" class="bg-gray-100">
+      <button (click)="logout()" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" style="font-size: 1.2rem;">Logout</button>
+    </div>
+    <div style="margin-top: -100px;" class="min-h-screen flex items-center justify-center bg-gray-100  px-4 sm:px-6 lg:px-20">
+      
       <div class="max-w-xl w-full space-y-8">
+        
         <div class="custom-container p-6 rounded-md shadow-md">
-          <div class="flex justify-center space-x-4">
-            <button id="getUsersBtn" class="btn-blue" (click)="getUsers()">Get Users</button>
-            <button id="getRoomsBtn" class="btn-green" (click)="getRooms()">Get Rooms</button>
-            <button id="createRoomBtn" class="btn-purple" (click)="showCreateRoomForm()">Create Room</button>
-          </div>
+          <mat-tab-group mat-align-tabs="start" >
+            <!-- #enddocregion align-start -->
+              <mat-tab label="Get Users" ><div  >
+                <table mat-table [dataSource]="pageSlice" class=" mat-elevation-z8 customTable">
+    
+                  <!--- Note that these columns can be defined in any order.
+                        The actual rendered columns are set as a property on the row definition" -->
+                  <!-- Position Column -->
+                  <ng-container matColumnDef="username">
+                    <th mat-header-cell *matHeaderCellDef> Username </th>
+                    <td mat-cell *matCellDef="let element"> {{element.username}} </td>
+                  </ng-container>
+                
+                  <!-- Name Column -->
+                  <ng-container matColumnDef="firstName">
+                    <th mat-header-cell *matHeaderCellDef> FirstName </th>
+                    <td mat-cell *matCellDef="let element"> {{element.firstName}} </td>
+                  </ng-container>
+                
+                  <!-- Weight Column -->
+                  <ng-container matColumnDef="lastName">
+                    <th mat-header-cell *matHeaderCellDef> LastName </th>
+                    <td mat-cell *matCellDef="let element"> {{element.lastName}} </td>
+                  </ng-container>
+                
+                  <!-- Symbol Column -->
+                  <ng-container matColumnDef="email">
+                    <th mat-header-cell *matHeaderCellDef> Email </th>
+                    <td mat-cell *matCellDef="let element"> {{element.email}} </td>
+                  </ng-container>
+                
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+                <mat-paginator class="pag" [length]="users.length"[pageSize]="4" (page)="onPageChange($event)" [pageSizeOptions]="[4, 8, 12]" showFirstLastButtons></mat-paginator>
+                </div></mat-tab>
+              <mat-tab label="Get Rooms"><table  class="table-auto w-full">
+                <thead>
+                  <tr>
+                    <th class="bg-white-500 text-black py-2 px-4">Room Name</th>
+                    <th class="bg-white-500 text-black py-2 px-4">Users In Room</th>
+                    <th class="bg-white-500 text-black py-2 px-4"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let room of rooms">
+                    <td class="border-b border-black py-2 px-4 text-center">{{ room.Name }}</td>
+                    <td class="border-b border-black py-2 px-4 text-center">{{ room.Count }}</td>
+                    <td class="border-b border-black py-2 px-4 text-center">
+                      <div class="py-2 relative">
+                        <button mat-icon-button [matMenuTriggerFor]="menu" >
+                          <mat-icon>more_vert</mat-icon>
+                        </button>
+                        <mat-menu #menu="matMenu" xPosition="after" >
+                          <button mat-menu-item (click)="showPopUpUsers(room)">
+                            <mat-icon>perm_identity</mat-icon>
+                            <span>Show Users</span>
+                          </button>
+                          <button mat-menu-item (click)="showAddPopUp(room)" >
+                            <mat-icon>add_circle_outline</mat-icon>
+                            <span>Add Users</span>
+                          </button>
+                          <button mat-menu-item (click)="showPopUpRemoveUser(room)">
+                            <mat-icon>delete_outline</mat-icon>
+                            <span>Remove Users</span>
+                          </button>
+                          <button mat-menu-item (click)="removeRoom(room)" >
+                            <mat-icon>delete_forever</mat-icon>
+                            <span>Remove Room</span>
+                          </button>
+                        </mat-menu>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table></mat-tab>
+              <mat-tab label="Create Room" (selectedTabChange)="getRooms()"><div  class="mt-4 text-center">
+                <input id="name" [(ngModel)]="newRoomName" class="border border-gray-400 rounded px-4 py-2 w-full" type="text" placeholder="Enter room name">
+                <button class="btn-purple mt-2 mx-auto" (click)="createRoom()">Create</button>
+              </div></mat-tab>
+            </mat-tab-group>
+            
+          
 
-          <div id="content" class="mt-4">
-            <table *ngIf="showUsers" mat-table [dataSource]="datasource" class=" mat-elevation-z8 customTable">
+          
+            
+            
 
-              <!--- Note that these columns can be defined in any order.
-                    The actual rendered columns are set as a property on the row definition" -->
-              <!-- Position Column -->
-              <ng-container matColumnDef="username">
-                <th mat-header-cell *matHeaderCellDef> Username </th>
-                <td mat-cell *matCellDef="let element"> {{element.username}} </td>
-              </ng-container>
             
-              <!-- Name Column -->
-              <ng-container matColumnDef="firstName">
-                <th mat-header-cell *matHeaderCellDef> FirstName </th>
-                <td mat-cell *matCellDef="let element"> {{element.firstName}} </td>
-              </ng-container>
-            
-              <!-- Weight Column -->
-              <ng-container matColumnDef="lastName">
-                <th mat-header-cell *matHeaderCellDef> LastName </th>
-                <td mat-cell *matCellDef="let element"> {{element.lastName}} </td>
-              </ng-container>
-            
-              <!-- Symbol Column -->
-              <ng-container matColumnDef="email">
-                <th mat-header-cell *matHeaderCellDef> Email </th>
-                <td mat-cell *matCellDef="let element"> {{element.email}} </td>
-              </ng-container>
-            
-              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-            </table>
-            
-            
-            <table *ngIf="showRooms" class="table-auto w-full">
-              <thead>
-                <tr>
-                  <th class="bg-white-500 text-black py-2 px-4">Room Name</th>
-                  <th class="bg-white-500 text-black py-2 px-4">Users In Room</th>
-                  <th class="bg-white-500 text-black py-2 px-4"></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let room of rooms">
-                  <td class="border-b border-black py-2 px-4 text-center">{{ room.Name }}</td>
-                  <td class="border-b border-black py-2 px-4 text-center">{{ room.Count }}</td>
-                  <td class="border-b border-black py-2 px-4 text-center">
-                    <div class="py-2">
-                      <button (click)="toggleDropdown(room)" class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-900 bg-inherit rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-600" type="button"> 
-                        <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
-                        </svg>
-                      </button>
-                      <ul [class.hidden]="!room.isDropdownOpen" class="absolute  mt-2 py-2 text-sm text-gray-700 dark:text-gray-200 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
-                        <li>
-                          <div  class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white text-center"><button (click)="showPopUpUsers(room)">View Users</button></div>
-                        </li>
-                        <li>
-                          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Add Users</a>
-                        </li>
-                        <li>
-                          <div  class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white text-center"><button (click)="showPopUpRemoveUser(room)">Remove User</button></div>
-
-                        </li>
-                        <li>
-                          <div  class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white text-center"><button (click)="removeRoom(room)">Remove Room</button></div>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div *ngIf="showCreateRoom" class="mt-4 text-center">
-              <input id="name" [(ngModel)]="newRoomName" class="border border-gray-400 rounded px-4 py-2 w-full" type="text" placeholder="Enter room name">
-              <button class="btn-purple mt-2 mx-auto" (click)="createRoom()">Create</button>
-            </div>
-          </div>
         </div>
       </div>
       

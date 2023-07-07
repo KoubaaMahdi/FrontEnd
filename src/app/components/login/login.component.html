@@ -27,11 +27,11 @@
           <label for="username" class="text-gray-700 font-medium">Nom d'utilisateur</label>
           <input type="text" id="username" name="username" class="w-full border-gray-300 border-solid border-2 rounded-md px-4 py-2 mt-1 focus:outline-none focus:border-blue-500" required>
         </div>
-        <div class="mb-6">
+        <div class="mb-6" (keyup.enter)="login()">
           <label for="password" class="text-gray-700 font-medium">Mot de passe</label>
           <input type="password" id="password" name="password" class="w-full border-gray-300 border-solid border-2 rounded-md px-4 py-2 mt-1 focus:outline-none focus:border-blue-500" required>
         </div>
-        <div class="mb-6">
+        <div class="mb-6"  >
           <label for="remember" class="flex items-center">
             <input type="checkbox" id="remember" name="remember" class="form-checkbox"  (change)="onCheckboxChange($event)"/>
             <span class="ml-2 text-gray-700">Se souvenir de moi</span>
@@ -39,7 +39,7 @@
         </div>
         <div id="wrong" class="error hidden">Mot de passe ou utilisateur incorrect</div>
         <div class="flex justify-center">
-          <button *ngIf="!isLoggedIn" type="button" (click)="login()" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring focus:ring-blue-500">
+          <button *ngIf="!isLoggedIn" type="button" (click)="login()"  class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring focus:ring-blue-500">
             Se connecter
           </button>
         </div>

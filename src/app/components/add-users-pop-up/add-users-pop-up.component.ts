@@ -1,23 +1,29 @@
-import { Component, Inject } from '@angular/core';
+import { Component , Inject , ViewChild ,ChangeDetectorRef} from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import {MatTable} from '@angular/material/table';
+import {SelectionModel} from '@angular/cdk/collections';
 import { PageEvent } from '@angular/material/paginator';
 
 @Component({
-  selector: 'app-show-users-pop-up',
-  templateUrl: './show-users-pop-up.component.html',
-  styleUrls: ['./show-users-pop-up.component.css'],
+  selector: 'app-add-users-pop-up',
+  templateUrl: './add-users-pop-up.component.html',
+  styleUrls: ['./add-users-pop-up.component.css']
 })
-export class ShowUsersPopUpComponent {
-  constructor(private router: Router,private http: HttpClient,@Inject(MAT_DIALOG_DATA) public data: Room){}
+export class AddUsersPopUpComponent {
+
+  constructor(private router: Router,private http: HttpClient,@Inject(MAT_DIALOG_DATA) public data: Room,private changeDetectorRefs: ChangeDetectorRef){}
+  @ViewChild(MatTable) table: MatTable<any> | undefined;
   hasMembers : boolean = false
   noMembers : boolean = false
   users: User[] = [];
-  displayedColumns: string[] = ['username', 'firstName', 'lastName', 'email'];
+  usersToRemove : User[] = [];
+  selection = new SelectionModel<User>(true, []);
   pageSlice : User []=[]
   ngOnInit(){
     this.getUsers()
+
   }
   onPageChange(event:PageEvent){
     const startIndex = event.pageIndex * event.pageSize;
@@ -46,11 +52,11 @@ export class ShowUsersPopUpComponent {
     
     const accessToken=tokenResponsee?.access_token;
     const refresh_token=tokenResponsee?.refresh_token;
-    localStorage.setItem('adminUser', JSON.stringify({ name: name,token: accessToken,refresh: refresh_token }));
+    localStorage.setItem('currentUser', JSON.stringify({ name: name,token: accessToken,refresh: refresh_token }));
     }
     }
     catch(error:any){
-      localStorage.removeItem('adminUser')
+      localStorage.removeItem('currentUser')
       this.router.navigate(['/'])
     }
   }
@@ -92,16 +98,69 @@ export class ShowUsersPopUpComponent {
         };
         this.users.push(currentUser)
     })
-    if(userResponse.length>0){
+    this.usersToRemove=[]
+    const tokenUrll = 'http://'+window.location.hostname+':8080/admin/realms/myreal/users/';
+    const userResponses: any = await this.getResponse(tokenUrll)
+    userResponses.forEach((user:any) =>{
+        let currentUser :User = {
+          id : user.id,
+          username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email
+        };
+        this.usersToRemove.push(currentUser)
+    })
+    this.users = this.usersToRemove.filter(user => !this.users.some(u => u.id === user.id));
+    this.pageSlice = this.users.slice(0,4)
+    
+    if(this.users.length>0){
       this.hasMembers=true
       this.noMembers = false
     }else{
       this.hasMembers=false
       this.noMembers = true
     }
-    this.pageSlice = this.users.slice(0,4)
+    
+}
+
+addUser(){
+  const test = localStorage.getItem('adminUser')
   
-  }
+  this.selection.selected.forEach(async(element:any) => {
+    const Urladd = 'http://localhost:8080/admin/realms/myreal/users/'+element.id+'/groups/'+this.data.id
+    try{
+      if(test){
+        const { token } = JSON.parse(test) as { token: string};
+        const tokenHeaderss = new HttpHeaders({
+          "Content-Type" : "application/x-www-form-urlencoded",
+          'Authorization': 'Bearer '+token
+        });
+        const tokenResponsee: any = await this.http.put(Urladd, { headers: tokenHeaderss }).toPromise();
+        console.log(tokenResponsee)
+        this.getUsers()
+        
+      }
+    }catch{
+      this.RefreshToken()
+    }
+  });
+}
+displayedColumns: string[] = ['select','username', 'firstName', 'lastName', 'email'];
+isAllSelected() {
+  const numSelected = this.selection.selected.length;
+  const numRows = this.pageSlice.length;
+  return numSelected === numRows;
+}
+
+/** Selects all rows if they are not all selected; otherwise clear selection. */
+masterToggle() {
+  this.isAllSelected() ?
+      this.selection.clear() :
+      this.pageSlice.forEach(row => this.selection.select(row));
+}
+
+
 }
 interface User {
   id : number

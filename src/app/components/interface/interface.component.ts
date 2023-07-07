@@ -270,5 +270,21 @@ export class InterfaceComponent implements OnInit {
   sendFile(name:any,data:any){
     
   }
+  async logout(){
+    try{
+      const test = localStorage.getItem('currentUser')
+      
+      if(test){
+      const { token,name } = JSON.parse(test) as { token: string ,name:string};
+      const tokenUrl = 'http://localhost:8080/admin/realms/myreal/users/f99abfb3-7e2a-4d32-b59b-e869a353c46a/logout' ;
+      const tokenHeaders = new HttpHeaders({
+      "Content-Type" : "application/x-www-form-urlencoded",
+      'Authorization': 'Bearer '+token
+      });
+      
+      const tokenResponse: any = await this.http.post(tokenUrl, { headers: tokenHeaders }).toPromise();
+      console.log(tokenResponse)
+    }}catch{}
+  }
 }
 export default InterfaceComponent

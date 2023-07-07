@@ -26,6 +26,11 @@ import { ShowRemoveUserPopUpComponent } from './components/show-remove-user-pop-
 import { MatTableModule } from '@angular/material/table'  
 import {MatPaginatorModule} from '@angular/material/paginator';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import {MatIconModule} from '@angular/material/icon';
+import { AddUsersPopUpComponent } from './components/add-users-pop-up/add-users-pop-up.component';
+import {MatTabsModule} from '@angular/material/tabs'
+import {MatMenuModule} from '@angular/material/menu';
+import {MatButtonModule} from '@angular/material/button';
 
 function initializeKeycloak(keycloak: KeycloakService) {
   return () =>
@@ -58,6 +63,7 @@ function initializeKeycloak(keycloak: KeycloakService) {
     InterfaceAdminComponent,
     ShowUsersPopUpComponent,
     ShowRemoveUserPopUpComponent,
+    AddUsersPopUpComponent,
     
     
 
@@ -75,6 +81,11 @@ function initializeKeycloak(keycloak: KeycloakService) {
     MatTableModule,
     MatCheckboxModule,
     MatPaginatorModule,
+    MatIconModule,
+    MatTabsModule,
+    MatMenuModule,
+    MatButtonModule
+    
   ],
   providers: [
     ChatService,

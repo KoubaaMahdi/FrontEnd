@@ -1,5 +1,5 @@
   <div id="content" *ngIf="hasMembers" >
-    <table mat-table [dataSource]="datasource" class="mat-elevation-z8">
+    <table mat-table [dataSource]="pageSlice" class="mat-elevation-z8">
 
       <!--- Note that these columns can be defined in any order.
             The actual rendered columns are set as a property on the row definition" -->
@@ -31,7 +31,8 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
     
-    
+    <mat-paginator class="pag" [length]="users.length"[pageSize]="4" (page)="onPageChange($event)" [pageSizeOptions]="[4, 8, 12]" showFirstLastButtons></mat-paginator>
+
 </div>
 <div class = "bg-white" *ngIf="noMembers">
     No Members In This Room

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { ChatService } from 'src/app/chat.service';
 
@@ -8,6 +8,7 @@ import { ChatService } from 'src/app/chat.service';
   styleUrls: ['./status.component.css']
 })
 export class StatusComponent {
+  @Output() sendClick = new EventEmitter<void>();
   constructor(private router: Router,private chat :ChatService){}
   ConnectedUser : any
   ngOnInit(){
@@ -18,7 +19,7 @@ export class StatusComponent {
     }
   }
   logout(){
-    localStorage.clear()
+    localStorage.removeItem('currentUser')
     this.router.navigate([''])
     this.chat.disconnect();
 

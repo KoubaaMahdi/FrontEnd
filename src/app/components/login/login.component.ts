@@ -22,11 +22,15 @@
     constructor(private readonly keycloak: KeycloakService,private router: Router,private http: HttpClient,private chat: ChatService) {}
     public async ngOnInit() {
       const test = localStorage.getItem('currentUser')
-      if(test){
+      const test2 = localStorage.getItem('adminUser')
         if(test){
           this.router.navigate(['/chat'])
         }
-      }
+        if(test2){
+          this.router.navigate(['/admin'])
+        }
+
+      
       
     }
 
@@ -63,11 +67,20 @@
       const refreshToken = tokenResponse?.refresh_token;
     
     if (accessToken) {
-      localStorage.setItem('currentUser', JSON.stringify({ name: username,token: accessToken,refresh: refreshToken }));
       if(this.isChecked){
+        
         localStorage.setItem('LoginCreds',JSON.stringify({ username: username,pass: password}))
       }
-      this.router.navigate(["/chat"])
+      if(username.toLowerCase()==='admin'){
+        localStorage.setItem('adminUser', JSON.stringify({ name: username,token: accessToken,refresh: refreshToken }));
+        this.router.navigate(["/admin"])
+      }
+      else{
+        localStorage.setItem('currentUser', JSON.stringify({ name: username,token: accessToken,refresh: refreshToken }));
+        this.router.navigate(["/chat"])
+      }
+      
+      
     }
   }catch{
     block.setAttribute("class","error")

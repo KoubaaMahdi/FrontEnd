@@ -1,37 +1,35 @@
-import { Component } from '@angular/core';
+import { Component,Input,ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { MatDialog  } from '@angular/material/dialog';
 import { ShowUsersPopUpComponent } from '../show-users-pop-up/show-users-pop-up.component';
 import { ShowRemoveUserPopUpComponent } from '../show-remove-user-pop-up/show-remove-user-pop-up.component'
+import { AddUsersPopUpComponent } from '../add-users-pop-up/add-users-pop-up.component'
+import { PageEvent } from '@angular/material/paginator';
+import { KeycloakService } from 'keycloak-angular';
 
 @Component({
   selector: 'app-interface-admin',
   templateUrl: './interface-admin.component.html',
-  styleUrls: ['./interface-admin.component.css']
+  styleUrls: ['./interface-admin.component.css'],
+
+
 })
 export class InterfaceAdminComponent {
-
   constructor(private router: Router,private http: HttpClient,private dialog: MatDialog){}
-  currentUserString = localStorage.getItem('currentUser');
-  datasource: User[] = []
+  currentUserString = localStorage.getItem('adminUser');
+  
   displayedColumns: string[] = ['username', 'firstName', 'lastName', 'email'];
-
+  pageSlice : User []=[]
   async ngOnInit() {
     if(!this.currentUserString){
       this.router.navigate(['/'])
     }
+    this.getRooms()
+    this.getUsers()
     
   }
-
-  toggleDropdown(room:any) {
-    room.isDropdownOpen = !room.isDropdownOpen;
-    this.rooms.forEach(singleRoom => {
-      if(room!=singleRoom){
-        singleRoom.isDropdownOpen=false
-      }
-    });
-  }
+  
   showUsers: boolean = false;
   showRooms: boolean = false;
   showCreateRoom : boolean = false;
@@ -39,8 +37,16 @@ export class InterfaceAdminComponent {
   rooms: Room[] = [];
   newRoomName: string = '';
   RoomsInfo =[]
+  async logout(){
+      localStorage.removeItem('adminUser')
+      this.router.navigate([''])
+    }
+    
+    
+
+  
   async RefreshToken(){
-    const test = localStorage.getItem('currentUser')
+    const test = localStorage.getItem('adminUser')
     try{
       if(test){const { refresh,name } = JSON.parse(test) as { refresh: string,name:string };
     const tokenUrll ='http://'+window.location.hostname+':8080/realms/myreal/protocol/openid-connect/token'
@@ -57,11 +63,11 @@ export class InterfaceAdminComponent {
     
     const accessToken=tokenResponsee?.access_token;
     const refresh_token=tokenResponsee?.refresh_token;
-    localStorage.setItem('currentUser', JSON.stringify({ name: name,token: accessToken,refresh: refresh_token }));
+    localStorage.setItem('adminUser', JSON.stringify({ name: name,token: accessToken,refresh: refresh_token }));
     }
     }
     catch(error:any){
-      localStorage.removeItem('currentUser')
+      localStorage.removeItem('adminUser')
       this.router.navigate(['/'])
     }
   }
@@ -69,7 +75,7 @@ export class InterfaceAdminComponent {
     let retry=true
     while(retry){
       try{
-        const test = localStorage.getItem('currentUser')
+        const test = localStorage.getItem('adminUser')
         
         if(test){
         const { token,name } = JSON.parse(test) as { token: string ,name:string};
@@ -89,6 +95,15 @@ export class InterfaceAdminComponent {
     }
       
   }
+  onPageChange(event:PageEvent){
+    const startIndex = event.pageIndex * event.pageSize;
+    let endIndex = startIndex+event.pageSize;
+    if(endIndex>this.users.length){
+      endIndex=this.users.length
+    }
+    this.pageSlice = this.users.slice(startIndex,endIndex)
+    
+  }
   async getUsers() {
     this.users=[]
     const tokenUrl = 'http://'+window.location.hostname+':8080/admin/realms/myreal/users/';
@@ -103,9 +118,7 @@ export class InterfaceAdminComponent {
         };
         this.users.push(currentUser)
     })
-    this.datasource =this.users;
-    console.log(this.users)
-    
+    this.pageSlice = this.users.slice(0,4)  
     this.showUsers = true;
     this.showRooms = false;
     this.showCreateRoom = false
@@ -136,7 +149,7 @@ export class InterfaceAdminComponent {
     this.rooms.forEach(async(signleRoom:any) => {
       if(Room.name==signleRoom.name){
        const url = 'http://localhost:8080/admin/realms/myreal/groups/'+Room.id
-       const test = localStorage.getItem('currentUser')
+       const test = localStorage.getItem('adminUser')
        if(test){
         const { token } = JSON.parse(test) as { token: string};
         const tokenHeaderss = new HttpHeaders({
@@ -151,24 +164,32 @@ export class InterfaceAdminComponent {
     });
 
   }
-  showCreateRoomForm() {
-    this.showUsers = false;
-    this.showRooms = false;
-    this.showCreateRoom = true
-    this.newRoomName = '';
-  }
+
 
   async createRoom() {
     // Get the room name from the input field
-    let retry = true
-    while(retry){
+    console.log("slt")
+    const newRoom = document.getElementById("name");
+    if (newRoom instanceof HTMLInputElement){
+      const roomName = newRoom.value;
+      console.log(this.rooms)
+      this.rooms.forEach(room =>{
+        console.log(room.Name)
+        if (room.Name === roomName){
+          alert('Name Already Exists')
+          return
+        }
+        
+      })
+      let retry = true
+      while(retry){
       try{
-        const test = localStorage.getItem('currentUser')
+        const test = localStorage.getItem('adminUser')
         
         if(test){
-          const newRoom = document.getElementById("name");
+          
           const { token } = JSON.parse(test) as { token: string};
-      if (newRoom instanceof HTMLInputElement) {
+    
         const roomName = newRoom.value;
         const tokenUrll ='http://'+window.location.hostname+':8080/admin/realms/myreal/groups'
         const tokenHeaderss = new HttpHeaders({
@@ -176,21 +197,28 @@ export class InterfaceAdminComponent {
           'Authorization': 'Bearer '+token
         });
         const tokenResponsee: any = await this.http.post(tokenUrll,{"name": roomName,"path": '/'+roomName,"subGroups": []}, { headers: tokenHeaderss }).toPromise();
+        this.getRooms()
         alert('Room '+roomName+' Created')
+        this.newRoomName = '';
         retry = false
-      }
+      
         }
       }catch{
         this.RefreshToken()
         retry = true
       }
     }
+    }
+    
     
 
     
   }
   showPopUpUsers(room:any){
     this.dialog.open(ShowUsersPopUpComponent,{data:room})
+  }
+  showAddPopUp(room:any){
+    this.dialog.open(AddUsersPopUpComponent,{data:room})
   }
   showPopUpRemoveUser(room:any){
     this.dialog.open(ShowRemoveUserPopUpComponent,{data:room})

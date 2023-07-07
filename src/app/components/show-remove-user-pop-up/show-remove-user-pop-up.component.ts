@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import {MatTable} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
+import { PageEvent } from '@angular/material/paginator';
 
 
 @Component({
@@ -14,21 +15,31 @@ import {SelectionModel} from '@angular/cdk/collections';
 })
 
 export class ShowRemoveUserPopUpComponent {
-  constructor(private router: Router,private http: HttpClient,@Inject(MAT_DIALOG_DATA) public data: Room,private changeDetectorRefs: ChangeDetectorRef){}
+  public InterfaceAdminComponent :any
+  constructor(private router: Router,private http: HttpClient,@Inject(MAT_DIALOG_DATA) public data: Room,private changeDetectorRefs: ChangeDetectorRef){
+    
+  }
   @ViewChild(MatTable) table: MatTable<any> | undefined;
   hasMembers : boolean = false
   noMembers : boolean = false
   users: User[] = [];
-  datasource :User[]=[]
   selection = new SelectionModel<User>(true, []);
+  pageSlice : User []=[]
   ngOnInit(){
     this.getUsers()
-    //this.datasource.paginator = this.paginator;
 
   }
-  
+  onPageChange(event:PageEvent){
+    const startIndex = event.pageIndex * event.pageSize;
+    let endIndex = startIndex+event.pageSize;
+    if(endIndex>this.users.length){
+      endIndex=this.users.length
+    }
+    this.pageSlice = this.users.slice(startIndex,endIndex)
+    
+  }
   async RefreshToken(){
-    const test = localStorage.getItem('currentUser')
+    const test = localStorage.getItem('adminUser')
     try{
       if(test){const { refresh,name } = JSON.parse(test) as { refresh: string,name:string };
     const tokenUrll ='http://'+window.location.hostname+':8080/realms/myreal/protocol/openid-connect/token'
@@ -45,11 +56,11 @@ export class ShowRemoveUserPopUpComponent {
     
     const accessToken=tokenResponsee?.access_token;
     const refresh_token=tokenResponsee?.refresh_token;
-    localStorage.setItem('currentUser', JSON.stringify({ name: name,token: accessToken,refresh: refresh_token }));
+    localStorage.setItem('adminUser', JSON.stringify({ name: name,token: accessToken,refresh: refresh_token }));
     }
     }
     catch(error:any){
-      localStorage.removeItem('currentUser')
+      localStorage.removeItem('adminUser')
       this.router.navigate(['/'])
     }
   }
@@ -57,7 +68,7 @@ export class ShowRemoveUserPopUpComponent {
     let retry=true
     while(retry){
       try{
-        const test = localStorage.getItem('currentUser')
+        const test = localStorage.getItem('adminUser')
         
         if(test){
         const { token,name } = JSON.parse(test) as { token: string ,name:string};
@@ -91,10 +102,7 @@ export class ShowRemoveUserPopUpComponent {
         };
         this.users.push(currentUser)
     })
-    if(this.table){
-      this.table.renderRows()
-    }
-    this.datasource =this.users;
+    this.pageSlice = this.users.slice(0,4)
     if(userResponse.length>0){
       this.hasMembers=true
       this.noMembers = false
@@ -103,10 +111,30 @@ export class ShowRemoveUserPopUpComponent {
       this.noMembers = true
     }
 }
+
+removeUsers(){
+  const test = localStorage.getItem('adminUser')
+  
+  this.selection.selected.forEach(async(element:any) => {
+    const UrlRemove = 'http://localhost:8080/admin/realms/myreal/users/'+element.id+'/groups/'+this.data.id
+    if(test){
+      const { token } = JSON.parse(test) as { token: string};
+      const tokenHeaderss = new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer '+token
+      });
+      const tokenResponsee: any = await this.http.delete(UrlRemove, { headers: tokenHeaderss }).toPromise();
+      this.getUsers()
+      this.InterfaceAdminComponent.getRooms()
+      
+    }
+
+  });
+}
 displayedColumns: string[] = ['select','username', 'firstName', 'lastName', 'email'];
 isAllSelected() {
   const numSelected = this.selection.selected.length;
-  const numRows = this.datasource.length;
+  const numRows = this.pageSlice.length;
   return numSelected === numRows;
 }
 
@@ -114,7 +142,7 @@ isAllSelected() {
 masterToggle() {
   this.isAllSelected() ?
       this.selection.clear() :
-      this.datasource.forEach(row => this.selection.select(row));
+      this.pageSlice.forEach(row => this.selection.select(row));
 }
 
 logSelection() {
