@@ -27,7 +27,6 @@ export class ShowRemoveUserPopUpComponent {
   pageSlice : User []=[]
   ngOnInit(){
     this.getUsers()
-
   }
   onPageChange(event:PageEvent){
     const startIndex = event.pageIndex * event.pageSize;
@@ -92,6 +91,7 @@ export class ShowRemoveUserPopUpComponent {
     this.users=[]
     const tokenUrl = 'http://'+window.location.hostname+':8080/admin/realms/myreal/groups/'+this.data.id+'/members';
     const userResponse: any = await this.getResponse(tokenUrl)
+    console.log(userResponse)
     userResponse.forEach((user:any) =>{
         let currentUser :User = {
           id : user.id,
@@ -102,7 +102,14 @@ export class ShowRemoveUserPopUpComponent {
         };
         this.users.push(currentUser)
     })
-    this.pageSlice = this.users.slice(0,4)
+    if(this.users.length>4){
+      this.pageSlice = this.users.slice(0,4)
+    }else{
+      
+      this.pageSlice = this.users
+    }
+
+
     if(userResponse.length>0){
       this.hasMembers=true
       this.noMembers = false
@@ -110,27 +117,33 @@ export class ShowRemoveUserPopUpComponent {
       this.hasMembers=false
       this.noMembers = true
     }
+    console.log(this.users)
 }
 
-removeUsers(){
-  const test = localStorage.getItem('adminUser')
-  
-  this.selection.selected.forEach(async(element:any) => {
-    const UrlRemove = 'http://localhost:8080/admin/realms/myreal/users/'+element.id+'/groups/'+this.data.id
-    if(test){
-      const { token } = JSON.parse(test) as { token: string};
-      const tokenHeaderss = new HttpHeaders({
+removeUsers() {
+  const test = localStorage.getItem('adminUser');
+  const promises = this.selection.selected.map(async (element: any) => {
+    const UrlRemove = 'http://' + window.location.hostname + ':8080/admin/realms/myreal/users/' + element.id + '/groups/' + this.data.id;
+    if (test) {
+      const { token } = JSON.parse(test) as { token: string };
+      const tokenHeaders = new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer '+token
+        'Authorization': 'Bearer ' + token
       });
-      const tokenResponsee: any = await this.http.delete(UrlRemove, { headers: tokenHeaderss }).toPromise();
-      this.getUsers()
-      this.InterfaceAdminComponent.getRooms()
-      
+      const tokenResponse: any = await this.http.delete(UrlRemove, { headers: tokenHeaders }).toPromise();
     }
-
   });
+
+  Promise.all(promises)
+    .then(() => {
+      this.selection.clear();
+      this.getUsers();
+    })
+    .catch((error) => {
+      // Handle error if necessary
+    });
 }
+
 displayedColumns: string[] = ['select','username', 'firstName', 'lastName', 'email'];
 isAllSelected() {
   const numSelected = this.selection.selected.length;
@@ -143,10 +156,6 @@ masterToggle() {
   this.isAllSelected() ?
       this.selection.clear() :
       this.pageSlice.forEach(row => this.selection.select(row));
-}
-
-logSelection() {
-  this.selection.selected.forEach(s => console.log(s));
 }
 }
 interface User {

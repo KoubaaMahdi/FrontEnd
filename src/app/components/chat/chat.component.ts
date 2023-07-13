@@ -13,4 +13,6 @@ export class ChatComponent {
   @Input() name:string='';
   @Input() message:string='';
   @Input() date :string='';
+  @Input() file: boolean = false; // Add the file input property
+
 }

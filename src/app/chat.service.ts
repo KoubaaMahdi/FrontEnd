@@ -24,9 +24,7 @@ export class ChatService {
   /*sendMsg(msg:any) {
     this.messages.next(msg);
   }*/
-  sendFile(name:any,data:any){
-    
-  }
+  
   sendMsg(msg:any){
     this.messages.next(msg)
   }
@@ -38,6 +36,9 @@ export class ChatService {
   }
   disconnect(){
     this.wsService.disconnect()
+  }
+  sendFile(file:any){
+    this.wsService.upload(file)
   }
 
 }

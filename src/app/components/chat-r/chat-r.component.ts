@@ -8,4 +8,5 @@ import { Component ,Input} from '@angular/core';
 export class ChatRComponent {
   @Input() message:string='';
   @Input() date :string='';
+  @Input() file: boolean = false; // Add the file input property
 }

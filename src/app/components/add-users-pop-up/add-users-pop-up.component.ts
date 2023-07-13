@@ -19,6 +19,7 @@ export class AddUsersPopUpComponent {
   noMembers : boolean = false
   users: User[] = [];
   usersToRemove : User[] = [];
+  usersAll : User[] = [];
   selection = new SelectionModel<User>(true, []);
   pageSlice : User []=[]
   ngOnInit(){
@@ -56,7 +57,7 @@ export class AddUsersPopUpComponent {
     }
     }
     catch(error:any){
-      localStorage.removeItem('currentUser')
+      localStorage.removeItem('adminUser')
       this.router.navigate(['/'])
     }
   }
@@ -86,32 +87,37 @@ export class AddUsersPopUpComponent {
   }
   async getUsers() {
     this.users=[]
-    const tokenUrl = 'http://'+window.location.hostname+':8080/admin/realms/myreal/groups/'+this.data.id+'/members';
-    const userResponse: any = await this.getResponse(tokenUrl)
-    userResponse.forEach((user:any) =>{
-        let currentUser :User = {
-          id : user.id,
-          username: user.username,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email
-        };
-        this.users.push(currentUser)
-    })
-    this.usersToRemove=[]
-    const tokenUrll = 'http://'+window.location.hostname+':8080/admin/realms/myreal/users/';
-    const userResponses: any = await this.getResponse(tokenUrll)
-    userResponses.forEach((user:any) =>{
-        let currentUser :User = {
-          id : user.id,
-          username: user.username,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email
-        };
-        this.usersToRemove.push(currentUser)
-    })
-    this.users = this.usersToRemove.filter(user => !this.users.some(u => u.id === user.id));
+    this.usersAll = []
+    try{
+      const tokenUrl = 'http://'+window.location.hostname+':8080/admin/realms/myreal/groups/'+this.data.id+'/members';
+      const userResponse: any = await this.getResponse(tokenUrl)
+      userResponse.forEach((user:any) =>{
+          let currentUser :User = {
+            id : user.id,
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email
+          };
+          this.usersAll.push(currentUser)
+      })
+      this.usersToRemove=[]
+      const tokenUrll = 'http://'+window.location.hostname+':8080/admin/realms/myreal/users/';
+      const userResponses: any = await this.getResponse(tokenUrll)
+      userResponses.forEach((user:any) =>{
+          let currentUser :User = {
+            id : user.id,
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email
+          };
+          this.usersToRemove.push(currentUser)
+      })
+    }catch{
+      this.RefreshToken()
+    }
+    this.users = this.usersToRemove.filter(user => !this.usersAll.some(u => u.id === user.id));
     this.pageSlice = this.users.slice(0,4)
     
     if(this.users.length>0){
@@ -121,31 +127,38 @@ export class AddUsersPopUpComponent {
       this.hasMembers=false
       this.noMembers = true
     }
-    
 }
 
-addUser(){
-  const test = localStorage.getItem('adminUser')
-  
-  this.selection.selected.forEach(async(element:any) => {
-    const Urladd = 'http://localhost:8080/admin/realms/myreal/users/'+element.id+'/groups/'+this.data.id
-    try{
-      if(test){
-        const { token } = JSON.parse(test) as { token: string};
-        const tokenHeaderss = new HttpHeaders({
-          "Content-Type" : "application/x-www-form-urlencoded",
-          'Authorization': 'Bearer '+token
+addUser() {
+  const test = localStorage.getItem('adminUser');
+  const promises = this.selection.selected.map(async (element: any) => {
+    const Urladd = 'http://' + window.location.hostname + ':8080/admin/realms/myreal/users/' + element.id + '/groups/' + this.data.id;
+    try {
+      if (test) {
+        const { token } = JSON.parse(test) as { token: string };
+        const tokenHeaders = new HttpHeaders({
+          "Content-Type": "application/json",
+          'Authorization': 'Bearer ' + token
         });
-        const tokenResponsee: any = await this.http.put(Urladd, { headers: tokenHeaderss }).toPromise();
-        console.log(tokenResponsee)
-        this.getUsers()
-        
+        const tokenResponse: any = await this.http.put(Urladd, null, { headers: tokenHeaders }).toPromise();
+        console.log("1");
       }
-    }catch{
-      this.RefreshToken()
+    } catch {
+      this.RefreshToken();
     }
   });
+
+  Promise.all(promises)
+    .then(() => {
+      console.log("2")
+      this.selection.clear();
+      this.getUsers();
+    })
+    .catch((error) => {
+      // Handle error if necessary
+    });
 }
+
 displayedColumns: string[] = ['select','username', 'firstName', 'lastName', 'email'];
 isAllSelected() {
   const numSelected = this.selection.selected.length;

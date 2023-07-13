@@ -1,7 +1,5 @@
   import { Component } from '@angular/core';
   import { KeycloakService } from 'keycloak-angular';
-  import { NgModule } from '@angular/core';
-  import { FormsModule } from '@angular/forms';
   import { Router } from '@angular/router';
   import { HttpClient, HttpHeaders } from '@angular/common/http';
   import { ChatService } from '../../chat.service';
@@ -34,7 +32,7 @@
       
     }
 
-    public async login() {
+    public login() {
       this.checkIfClientExists();
       
       
@@ -75,7 +73,7 @@
         localStorage.setItem('adminUser', JSON.stringify({ name: username,token: accessToken,refresh: refreshToken }));
         this.router.navigate(["/admin"])
       }
-      else{
+      else if (username!==""){
         localStorage.setItem('currentUser', JSON.stringify({ name: username,token: accessToken,refresh: refreshToken }));
         this.router.navigate(["/chat"])
       }

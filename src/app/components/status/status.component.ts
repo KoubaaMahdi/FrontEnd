@@ -19,8 +19,7 @@ export class StatusComponent {
     }
   }
   logout(){
-    localStorage.removeItem('currentUser')
-    this.router.navigate([''])
+    
     this.chat.disconnect();
 
   }

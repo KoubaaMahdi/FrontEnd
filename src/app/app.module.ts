@@ -31,6 +31,10 @@ import { AddUsersPopUpComponent } from './components/add-users-pop-up/add-users-
 import {MatTabsModule} from '@angular/material/tabs'
 import {MatMenuModule} from '@angular/material/menu';
 import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatInputModule} from '@angular/material/input';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+import { FileUploadService } from './file-upload-service.service';
 
 function initializeKeycloak(keycloak: KeycloakService) {
   return () =>
@@ -84,12 +88,15 @@ function initializeKeycloak(keycloak: KeycloakService) {
     MatIconModule,
     MatTabsModule,
     MatMenuModule,
-    MatButtonModule
-    
+    MatButtonModule,
+    MatCardModule,
+    MatInputModule,
+    MatProgressBarModule
   ],
   providers: [
     ChatService,
     WebsocketService,
+    FileUploadService,
     {
       provide: APP_INITIALIZER,
       useFactory: initializeKeycloak,

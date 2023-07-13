@@ -102,8 +102,8 @@
                 </tbody>
               </table></mat-tab>
               <mat-tab label="Create Room" (selectedTabChange)="getRooms()"><div  class="mt-4 text-center">
-                <input id="name" [(ngModel)]="newRoomName" class="border border-gray-400 rounded px-4 py-2 w-full" type="text" placeholder="Enter room name">
-                <button class="btn-purple mt-2 mx-auto" (click)="createRoom()">Create</button>
+                <input id="name" (keyup.enter)="createRoom()" [(ngModel)]="newRoomName" class="border border-gray-400 rounded px-4 py-2 w-full" type="text" placeholder="Enter room name">
+                <button class="btn-purple mt-2 mx-auto" (click)="createRoom()" >Create</button>
               </div></mat-tab>
             </mat-tab-group>
             

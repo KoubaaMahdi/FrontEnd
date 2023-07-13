@@ -1,7 +1,11 @@
 <div class="message me mb-4 flex text-right">
     <div class="flex-1 px-2">
-        <div class="inline-block bg-blue-600 rounded-full p-2 px-6 text-white">
-            <span>{{message}}</span>
+        <div *ngIf="!file" class="inline-block bg-blue-600 rounded-2xl p-2 px-6 text-white max-w-sm">
+            <span class="break-all">{{message}}</span>
+        </div>
+        <div *ngIf="file" class="inline-block bg-gray-200 rounded-2xl p-2 px-6 text-black">
+            <mat-icon class="bg-gray-500 rounded-full">get_app</mat-icon>
+            <span class="break-all">{{message}}</span>
         </div>
         <div class="pr-4"><small class="text-gray-500">{{date}}</small></div>
     </div>

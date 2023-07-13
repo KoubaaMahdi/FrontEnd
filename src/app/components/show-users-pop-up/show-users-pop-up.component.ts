@@ -61,7 +61,7 @@ export class ShowUsersPopUpComponent {
         const test = localStorage.getItem('adminUser')
         
         if(test){
-        const { token,name } = JSON.parse(test) as { token: string ,name:string};
+        const { token } = JSON.parse(test) as { token: string };
         const tokenUrl = path ;
         const tokenHeaders = new HttpHeaders({
         'Content-Type': 'application/x-www-form-urlencoded',

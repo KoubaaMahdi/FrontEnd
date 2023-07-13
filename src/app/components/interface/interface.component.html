@@ -31,11 +31,11 @@
                                 <div class="flex-1 h-full overflow-auto px-2">
                                   <div class="card-body contacts_body">
                                     <ul class="contacts" id="contactsCard">
-                                      <li id ="list" *ngFor="let person of peopleList" (click)="removeActive(person)" >
+                                      <li id ="list" *ngFor="let person of pageSlice" (click)="removeActive(person)" >
                                         <app-person [name]="person.name"  [active]="person.active" [photo]="person.photo"></app-person>
                                       </li>
+                                      <mat-paginator class="pag bg-gray-100" [length]="peopleList.length"[pageSize]="3" (page)="onPageChange($event)" [pageSizeOptions]="[3]" showFirstLastButtons  *ngIf="pageSlice.length > 0"></mat-paginator>
                                     </ul>
-                                    
                                   </div>
                                 </div>
                               </div>
